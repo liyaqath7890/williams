@@ -5,6 +5,7 @@ export const createSosSchema = z.object({
     disasterType: z.string().min(2),
     severity: z.enum(['low', 'medium', 'high', 'critical']).default('high'),
     description: z.string().optional(),
+    mobileNumber: z.string().optional(),
     location: z.object({
       lat: z.coerce.number(),
       lng: z.coerce.number(),

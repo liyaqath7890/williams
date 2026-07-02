@@ -22,6 +22,10 @@ export const SosIncident = sequelize.define(
       type: DataTypes.ENUM('open', 'assigned', 'in_progress', 'resolved', 'closed'),
       defaultValue: 'open'
     },
+    mobileNumber: {
+      type: DataTypes.STRING(20),
+      allowNull: true
+    },
     location: {
       type: DataTypes.JSONB,
       allowNull: false

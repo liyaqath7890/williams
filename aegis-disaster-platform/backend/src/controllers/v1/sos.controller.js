@@ -1,12 +1,19 @@
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { sendSuccess } from '../../utils/apiResponse.js';
 import { createSosIncident, listSosIncidents } from '../../services/sos.service.js';
+import { createBroadcastNotification } from '../../services/notification.service.js';
 import { emitSosCreated, emitSosUpdated } from '../../sockets/emitters.js';
 import { SosIncident, User } from '../../models/index.js';
 
 export const createSos = asyncHandler(async (req, res) => {
   const incident = await createSosIncident(req.user.id, req.validated.body);
   emitSosCreated(incident.toJSON());
+  await createBroadcastNotification({
+    title: 'New SOS alert',
+    body: `${incident.disasterType} request requires immediate response near ${incident.location?.address || 'the shared location'}.`,
+    type: 'sos',
+    data: { sosId: incident.id, status: incident.status }
+  });
   sendSuccess(res, incident, 'SOS incident created', 201);
 });
 
