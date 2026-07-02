@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import { BadgeCheck, MapPinned, PackageCheck, Users, AlertTriangle, CheckCircle, Clock, MapPin, Navigation } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
 import StatCard from '../../components/common/StatCard';
@@ -13,15 +14,19 @@ export default function HelperDashboard() {
   const { incidents } = useSelector((state) => state.sos);
   const { user } = useSelector((state) => state.auth);
   const [selectedIncident, setSelectedIncident] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     dispatch(fetchSosIncidents());
   }, [dispatch]);
 
-  // Filter lists
-  const openQueue = incidents.filter(inc => inc.status === 'open');
-  const myMissions = incidents.filter(inc => 
-    (inc.status === 'assigned' || inc.status === 'in_progress') && 
+  const currentView = searchParams.get('view') || 'requests';
+  const showOpenQueue = currentView !== 'assigned';
+  const showAssignedQueue = currentView !== 'requests';
+
+  const openQueue = incidents.filter((inc) => inc.status === 'open');
+  const myMissions = incidents.filter((inc) =>
+    (inc.status === 'assigned' || inc.status === 'in_progress') &&
     (inc.assignedTeamIds || []).includes(user?.id)
   );
 
@@ -59,7 +64,24 @@ export default function HelperDashboard() {
   return (
     <>
       <PageHeader title="Helper and NGO Dashboard" description="Accept emergency calls, track assigned rescue operations, and coordinate field relief." />
-      
+
+      <div className="mb-6 flex flex-wrap gap-3">
+        {[
+          { id: 'requests', label: 'Emergency Requests', count: openQueue.length },
+          { id: 'assigned', label: 'Assigned Missions', count: myMissions.length },
+          { id: 'all', label: 'All Missions', count: openQueue.length + myMissions.length }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setSearchParams({ view: tab.id })}
+            className={`rounded-2xl border px-4 py-2 text-sm font-bold transition ${currentView === tab.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'}`}
+          >
+            {tab.label} ({tab.count})
+          </button>
+        ))}
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={BadgeCheck} label="Assigned Missions" value={String(myMissions.length)} helper="Active responses" tone="danger" />
         <StatCard icon={Users} label="Open Requests" value={String(openQueue.length)} helper="Distress calls pending" tone="amber" />
@@ -71,8 +93,8 @@ export default function HelperDashboard() {
         <div className="space-y-6">
           <StatusBoard title="Field Readiness" items={fieldStatus} />
 
-          {/* Assigned Missions */}
-          <section className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          {showAssignedQueue && (
+            <section className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
             <div className="border-b border-slate-100 px-6 py-4 bg-slate-50 flex items-center justify-between">
               <h3 className="font-bold text-slate-900 flex items-center gap-2">
                 <Navigation className="h-5 w-5 text-indigo-600 animate-pulse" />
@@ -84,30 +106,53 @@ export default function HelperDashboard() {
                 <p className="p-6 text-sm text-slate-500 text-center">No active missions assigned to you.</p>
               ) : (
                 myMissions.map((inc) => (
-                  <div key={inc.id} onClick={() => setSelectedIncident(inc)} className="p-4 flex items-center justify-between hover:bg-slate-50 cursor-pointer transition-colors">
-                    <div>
-                      <p className="font-bold text-slate-900">{inc.disasterType}</p>
-                      <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5" />
-                        {inc.location?.address}
-                      </p>
+                  <div key={inc.id} className="p-4 flex flex-col gap-3 border-b last:border-b-0 border-slate-100 hover:bg-slate-50 transition-colors">
+                    <div onClick={() => setSelectedIncident(inc)} className="flex items-center justify-between cursor-pointer">
+                      <div>
+                        <p className="font-bold text-slate-900">{inc.disasterType}</p>
+                        <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+                          <MapPin className="h-3.5 w-3.5" />
+                          {inc.location?.address}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${priorityColors[inc.severity]}`}>
+                          {inc.severity}
+                        </span>
+                        <span className="rounded-full bg-indigo-100 px-2.5 py-1 text-[10px] font-black text-indigo-700 uppercase">
+                          {statusLabels[inc.status]}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${priorityColors[inc.severity]}`}>
-                        {inc.severity}
-                      </span>
-                      <span className="rounded-full bg-indigo-100 px-2.5 py-1 text-[10px] font-black text-indigo-700 uppercase">
-                        {statusLabels[inc.status]}
-                      </span>
+                    <div className="flex flex-wrap gap-2">
+                      {inc.status === 'assigned' && (inc.assignedTeamIds || []).includes(user?.id) && (
+                        <button
+                          type="button"
+                          onClick={() => handleAction(inc.id, 'in_progress')}
+                          className="rounded-full bg-amber-600 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-700 transition"
+                        >
+                          Start Rescue
+                        </button>
+                      )}
+                      {inc.status === 'in_progress' && (
+                        <button
+                          type="button"
+                          onClick={() => handleAction(inc.id, 'resolved')}
+                          className="rounded-full bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700 transition"
+                        >
+                          Mark Resolved
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))
               )}
             </div>
           </section>
+          )}
 
-          {/* Emergency Requests / Mission Queue */}
-          <section className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          {showOpenQueue && (
+            <section className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
             <div className="border-b border-slate-100 px-6 py-4 bg-slate-50 flex items-center justify-between">
               <h3 className="font-bold text-slate-900 flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-amber-500 animate-bounce" />
@@ -119,27 +164,37 @@ export default function HelperDashboard() {
                 <p className="p-6 text-sm text-slate-500 text-center">No open distress calls in queue.</p>
               ) : (
                 openQueue.map((inc) => (
-                  <div key={inc.id} onClick={() => setSelectedIncident(inc)} className="p-4 flex items-center justify-between hover:bg-slate-50 cursor-pointer transition-colors">
-                    <div>
-                      <p className="font-bold text-slate-900">{inc.disasterType}</p>
-                      <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5" />
-                        {inc.location?.address}
-                      </p>
+                  <div key={inc.id} className="p-4 flex flex-col gap-3 border-b last:border-b-0 border-slate-100 hover:bg-slate-50 transition-colors">
+                    <div onClick={() => setSelectedIncident(inc)} className="flex items-center justify-between cursor-pointer">
+                      <div>
+                        <p className="font-bold text-slate-900">{inc.disasterType}</p>
+                        <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+                          <MapPin className="h-3.5 w-3.5" />
+                          {inc.location?.address}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${priorityColors[inc.severity]}`}>
+                          {inc.severity}
+                        </span>
+                        <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-black text-amber-800 uppercase">
+                          {statusLabels[inc.status]}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${priorityColors[inc.severity]}`}>
-                        {inc.severity}
-                      </span>
-                      <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-black text-amber-800 uppercase">
-                        {statusLabels[inc.status]}
-                      </span>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); handleAction(inc.id, 'assigned', [...(inc.assignedTeamIds || []), user.id]); }}
+                      className="self-start rounded-full bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700 transition"
+                    >
+                      Accept Mission
+                    </button>
                   </div>
                 ))
               )}
             </div>
           </section>
+          )}
         </div>
 
         <div className="space-y-6">

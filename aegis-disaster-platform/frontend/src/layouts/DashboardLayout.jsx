@@ -23,8 +23,8 @@ const SIDEBAR_LINKS = {
   ],
   helper: [
     { label: 'Dashboard', to: ROUTES.HELPER_DASHBOARD, icon: Home },
-    { label: 'Emergency Requests', to: ROUTES.HELPER_DASHBOARD, icon: Siren },
-    { label: 'Assigned Missions', to: ROUTES.HELPER_DASHBOARD, icon: LifeBuoy },
+    { label: 'Emergency Requests', to: `${ROUTES.HELPER_DASHBOARD}?view=requests`, icon: Siren },
+    { label: 'Assigned Missions', to: `${ROUTES.HELPER_DASHBOARD}?view=assigned`, icon: LifeBuoy },
     { label: 'Live Map', to: ROUTES.MAPS, icon: Map },
     { label: 'Missing Person Search', to: ROUTES.MISSING_PERSONS, icon: Search },
     { label: 'Resource Requests', to: ROUTES.RESOURCES, icon: Package },

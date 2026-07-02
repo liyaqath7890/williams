@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { AlertTriangle, Bell, Radio, ShieldAlert, Trash2, Plus } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
@@ -31,12 +31,16 @@ export default function AlertsPage() {
   const toggleAudience = (role) => setForm((f) => ({ ...f, audience: f.audience.includes(role) ? f.audience.filter((r) => r !== role) : [...f.audience, role] }));
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await operationsService.publishAlert(form);
-    const saved = response.data.data;
-    setAlerts((prev) => [saved, ...prev]);
-    dispatch(pushAlert(saved));
-    setNotice('Alert published');
-    setForm(EMPTY);
+    try {
+      const response = await operationsService.publishAlert(form);
+      const saved = response.data.data;
+      setAlerts((prev) => [saved, ...prev]);
+      dispatch(pushAlert(saved));
+      setNotice('Alert published successfully');
+      setForm(EMPTY);
+    } catch (error) {
+      setNotice(error.response?.data?.message || 'Failed to publish alert');
+    }
   };
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this alert?')) return;

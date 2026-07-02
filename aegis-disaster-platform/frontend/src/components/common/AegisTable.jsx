@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, ChevronDown, ChevronUp, MoreVertical, Edit2, Trash2, Phone, Video } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, MoreVertical, Edit2, Trash2, Phone, Video, PhoneCall } from 'lucide-react';
 
 const AegisTable = ({ 
   columns, 
@@ -7,6 +7,7 @@ const AegisTable = ({
   onEdit, 
   onDelete, 
   onWhatsApp,
+  onDirectCall,
   title 
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -100,6 +101,15 @@ const AegisTable = ({
                           <Video className="w-4 h-4" />
                         </button>
                       </>
+                    )}
+                    {onDirectCall && (
+                      <button 
+                        onClick={() => onDirectCall(row)}
+                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                        title="Direct Call"
+                      >
+                        <PhoneCall className="w-4 h-4" />
+                      </button>
                     )}
                     <button 
                       onClick={() => onEdit(row)}

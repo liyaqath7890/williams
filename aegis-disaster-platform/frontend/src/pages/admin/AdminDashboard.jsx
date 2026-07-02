@@ -1,25 +1,37 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, ShieldCheck, Users, Warehouse, Siren, Shield, Zap, Bell, Phone, Video } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import PageHeader from '../../components/common/PageHeader';
 import StatCard from '../../components/common/StatCard';
 import AegisTable from '../../components/common/AegisTable';
 import { fetchSosIncidents } from '../../redux/features/sos/sosSlice';
+import { operationsService } from '../../services/operationsService';
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
   const { incidents } = useSelector((state) => state.sos);
   const { user } = useSelector((state) => state.auth);
+  const [analytics, setAnalytics] = useState({ summary: { incidents: 0, activeMissions: 0, resources: 0, shelters: 0 } });
 
   useEffect(() => {
     dispatch(fetchSosIncidents());
+    operationsService.getAnalytics().then((res) => setAnalytics(res.data.data)).catch(console.error);
   }, [dispatch]);
 
   const handleWhatsApp = (row, type) => {
     // Standard WhatsApp protocol: https://wa.me/number?text=message
-    const number = row.phone || '1234567890'; // fallback for demo
+    const number = row.mobileNumber || row.phone || '1234567890'; // fallback for demo
     const message = encodeURIComponent(`Aegis Command Center: Initiating ${type} contact regarding incident ${row.id || 'LIVE'}. Please respond.`);
     window.open(`https://wa.me/${number}?text=${message}`, '_blank');
+  };
+
+  const handleDirectCall = (row) => {
+    const number = row.mobileNumber || row.phone;
+    if (number) {
+      window.open(`tel:${number}`, '_self');
+    } else {
+      alert('No contact number available for this incident.');
+    }
   };
 
   const columns = [
@@ -39,6 +51,7 @@ const AdminDashboard = () => {
       )
     },
     { key: 'location', label: 'Deployment Zone', render: (loc) => loc?.address || 'Awaiting GPS' },
+    { key: 'mobileNumber', label: 'Contact', render: (val) => val || 'N/A' },
     { 
       key: 'severity', 
       label: 'Priority',
@@ -76,9 +89,9 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={Siren} label="Active Incidents" value={String(tableData.length)} helper="Emergency calls pending" tone="danger" />
-        <StatCard icon={Users} label="Rescue Units" value="42" helper="11 units deployed now" tone="indigo" />
-        <StatCard icon={Warehouse} label="Shelter Capacity" value="78%" helper="14 shelters operational" tone="amber" />
+        <StatCard icon={Siren} label="Active Incidents" value={String(analytics.summary.incidents || 0)} helper="Total emergencies recorded" tone="danger" />
+        <StatCard icon={Users} label="Active Missions" value={String(analytics.summary.activeMissions || 0)} helper="Ongoing rescue operations" tone="indigo" />
+        <StatCard icon={Warehouse} label="Total Shelters" value={String(analytics.summary.shelters || 0)} helper="Operational safe zones" tone="amber" />
         <StatCard icon={Activity} label="System Health" value="Optimal" helper="Satellite & Sensor feed live" tone="slate" />
       </div>
 
@@ -89,6 +102,7 @@ const AdminDashboard = () => {
             columns={columns} 
             data={tableData} 
             onWhatsApp={handleWhatsApp}
+            onDirectCall={handleDirectCall}
             onEdit={(row) => console.log('Edit', row)}
             onDelete={(row) => console.log('Delete', row)}
           />

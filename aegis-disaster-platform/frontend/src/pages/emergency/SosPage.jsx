@@ -16,7 +16,8 @@ export default function SosPage() {
   const [form, setForm] = useState({
     disasterType: 'Flood rescue',
     severity: 'critical',
-    description: 'Immediate rescue help needed. Location shared from Aegis SOS panel.'
+    description: 'Immediate rescue help needed. Location shared from Aegis SOS panel.',
+    mobileNumber: ''
   });
   const [location, setLocation] = useState(getSimulatedLocation());
   const [overlayVisible, setOverlayVisible] = useState(false);
@@ -132,6 +133,18 @@ export default function SosPage() {
                 name="description"
                 onChange={handleChange}
                 value={form.description}
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-slate-700">Mobile Number</span>
+              <input
+                type="tel"
+                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+                name="mobileNumber"
+                placeholder="e.g. +1234567890"
+                onChange={handleChange}
+                value={form.mobileNumber}
               />
             </label>
 

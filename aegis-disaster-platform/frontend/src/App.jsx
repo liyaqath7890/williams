@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCurrentUser, refreshSession, setBootstrapped } from './redux/features/auth/authSlice';
 import { pushAlert, removeAlert } from './redux/features/alerts/alertsSlice';
@@ -12,6 +12,15 @@ import ChatbotPanel from './components/ai/ChatbotPanel';
 export default function App() {
   const dispatch = useDispatch();
   const { accessToken, bootstrapped, user } = useSelector((state) => state.auth);
+  const [toasts, setToasts] = useState([]);
+
+  const addToast = (toast) => {
+    const id = Date.now().toString();
+    setToasts((prev) => [...prev, { ...toast, id }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 5000);
+  };
 
   useEffect(() => {
     if (bootstrapped) return;
@@ -55,6 +64,28 @@ export default function App() {
 
     const handleAlertBroadcast = (alert) => {
       dispatch(pushAlert(alert));
+      addToast({
+        title: 'Emergency Alert',
+        message: alert.title || alert.message,
+        type: 'danger'
+      });
+    };
+
+    const handleNotificationCreated = (notification) => {
+      dispatch(
+        pushAlert({
+          id: notification.id || `notification-${Date.now()}`,
+          title: notification.title || 'Notification',
+          message: notification.body || notification.detail || 'New notification received.',
+          severity: notification.severity || 'info',
+          createdAt: new Date().toISOString()
+        })
+      );
+      addToast({
+        title: 'New Notification',
+        message: notification.title || notification.body || notification.detail,
+        type: 'info'
+      });
     };
 
     const handleAlertDeleted = ({ id }) => {
@@ -76,6 +107,7 @@ export default function App() {
 
     socket.on(SOCKET_EVENTS.SOS_CREATED, handleSosCreated);
     socket.on(SOCKET_EVENTS.ALERT_BROADCAST, handleAlertBroadcast);
+    socket.on(SOCKET_EVENTS.NOTIFICATION_CREATED, handleNotificationCreated);
     socket.on(SOCKET_EVENTS.ALERT_DELETED, handleAlertDeleted);
     socket.on(SOCKET_EVENTS.ASSIGNMENT_CHANGED, handleAssignmentChanged);
     socket.on(SOCKET_EVENTS.CHAT_MESSAGE, (message) => dispatch(addMessage(message)));
@@ -86,6 +118,7 @@ export default function App() {
     return () => {
       socket.off(SOCKET_EVENTS.SOS_CREATED, handleSosCreated);
       socket.off(SOCKET_EVENTS.ALERT_BROADCAST, handleAlertBroadcast);
+      socket.off(SOCKET_EVENTS.NOTIFICATION_CREATED, handleNotificationCreated);
       socket.off(SOCKET_EVENTS.ALERT_DELETED, handleAlertDeleted);
       socket.off(SOCKET_EVENTS.ASSIGNMENT_CHANGED, handleAssignmentChanged);
       socket.off(SOCKET_EVENTS.CHAT_MESSAGE);
@@ -100,6 +133,21 @@ export default function App() {
     <>
       <Outlet />
       <ChatbotPanel />
+      {/* Global Toast Container */}
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
+        {toasts.map((toast) => (
+          <div 
+            key={toast.id} 
+            className={`pointer-events-auto shadow-lg rounded-lg p-4 transition-all transform animate-in slide-in-from-top-2 fade-in duration-300 border-l-4 bg-white
+              ${toast.type === 'danger' ? 'border-red-500' : 'border-blue-500'}`}
+          >
+            <h4 className={`font-bold text-sm ${toast.type === 'danger' ? 'text-red-700' : 'text-blue-700'}`}>
+              {toast.title}
+            </h4>
+            <p className="text-slate-600 text-xs mt-1">{toast.message}</p>
+          </div>
+        ))}
+      </div>
     </>
   );
 }
