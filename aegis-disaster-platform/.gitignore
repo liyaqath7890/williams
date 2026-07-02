@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+coverage/
+*.log
+backend/src/logs/*.log
+backend/src/uploads/*
+!backend/src/uploads/.gitkeep
+!backend/src/logs/.gitkeep
