@@ -1,4 +1,4 @@
-﻿import { cloudinary } from '../config/cloudinary.js';
+import { cloudinary } from '../config/cloudinary.js';
 import { Upload } from '../models/index.js';
 
 const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf', 'text/csv']);
@@ -18,6 +18,11 @@ function assertFile(file) {
 
 function uploadToCloudinary(file) {
   return new Promise((resolve, reject) => {
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      // Fallback for local development if Cloudinary is not configured
+      const mockUrl = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+      return resolve({ secure_url: mockUrl, public_id: `mock_${Date.now()}` });
+    }
     const stream = cloudinary.uploader.upload_stream(
       { folder: 'aegis-disaster-platform', resource_type: 'auto' },
       (error, result) => error ? reject(error) : resolve(result)

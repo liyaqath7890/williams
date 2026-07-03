@@ -39,11 +39,11 @@ export function emitMissingPersonChanged(action, person) {
 }
 
 export function emitNotificationCreated(notification) {
-  socketServer?.emit(SOCKET_EVENTS.NOTIFICATION_CREATED, notification);
+  socketServer?.to(`user_${notification.userId}`).emit(SOCKET_EVENTS.NOTIFICATION_CREATED, notification);
 }
 
 export function emitNotificationChanged(action, notification) {
-  socketServer?.emit(SOCKET_EVENTS.NOTIFICATION_CHANGED, { action, notification });
+  socketServer?.to(`user_${notification.userId}`).emit(SOCKET_EVENTS.NOTIFICATION_CHANGED, { action, notification });
 }
 
 export function emitTrackingUpdate(payload) {

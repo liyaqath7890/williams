@@ -1,4 +1,4 @@
-﻿import { Op } from 'sequelize';
+import { Op } from 'sequelize';
 import { Alert, MissingPerson, Resource, Shelter, SosIncident, User } from '../models/index.js';
 
 function dateWhere(query) {
@@ -28,9 +28,9 @@ export async function buildReport(query = {}) {
   const where = between(query);
   const [incidents, volunteers, shelters, resources, missingPersons, alerts] = await Promise.all([
     SosIncident.findAll({ where, order: [['createdAt', 'DESC']] }),
-    User.findAll({ where: { role: 'helper' }, order: [['createdAt', 'DESC']] }),
-    Shelter.findAll({ order: [['createdAt', 'DESC']] }),
-    Resource.findAll({ order: [['createdAt', 'DESC']] }),
+    User.findAll({ where: { role: 'helper', ...where }, order: [['createdAt', 'DESC']] }),
+    Shelter.findAll({ where, order: [['createdAt', 'DESC']] }),
+    Resource.findAll({ where, order: [['createdAt', 'DESC']] }),
     MissingPerson.findAll({ where, order: [['createdAt', 'DESC']] }),
     Alert.findAll({ where, order: [['createdAt', 'DESC']] })
   ]);

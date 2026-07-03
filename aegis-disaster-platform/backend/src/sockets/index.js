@@ -31,6 +31,9 @@ export function registerSocketHandlers(io) {
     if (socket.user?.role === 'helper') {
       socket.join('helpers');
     }
+    if (socket.user?.sub) {
+      socket.join(`user_${socket.user.sub}`);
+    }
 
     socket.on(SOCKET_EVENTS.CHAT_JOIN_ROOM, ({ roomId }) => {
       if (!roomId || !socket.user) return;
