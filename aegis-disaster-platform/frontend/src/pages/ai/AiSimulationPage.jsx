@@ -68,7 +68,7 @@ export default function AiSimulationPage() {
           <textarea className="mt-4 min-h-28 w-full rounded-md border border-slate-300 px-3 py-2" onChange={(event) => setPanicText(event.target.value)} value={panicText} />
           <button className="mt-3 rounded-md bg-aegis-primary px-4 py-2 font-semibold text-white" onClick={handlePanicCheck} type="button">Analyze Message</button>
           <div className="mt-4 rounded-md border border-red-100 bg-red-50 p-4 text-sm text-red-700">
-            Priority: <strong>{panic.priority}</strong> · Score: <strong>{panic.panicScore}</strong> · Matches: {panic.matches.join(', ') || 'none'}
+            Priority: <strong>{panic.priority || (panic.isPanic ? 'high' : 'low')}</strong> · Score: <strong>{panic.panicScore || (panic.confidence ? Math.round(panic.confidence * 100) : 0)}</strong> · Matches: {(panic.matches || []).join(', ') || 'none'}
           </div>
         </section>
 

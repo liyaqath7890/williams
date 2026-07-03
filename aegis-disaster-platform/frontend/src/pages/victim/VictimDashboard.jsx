@@ -70,7 +70,7 @@ export default function VictimDashboard() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <div className="space-y-6">
+        <div className="space-y-6 min-w-0">
           {/* Safety Guidance */}
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="font-black text-slate-900 text-lg mb-5">Safety Guidance</h2>

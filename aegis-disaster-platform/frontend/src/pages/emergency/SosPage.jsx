@@ -78,7 +78,7 @@ export default function SosPage() {
       <EmergencyOverlay incident={activeIncident} onClose={handleCloseOverlay} visible={overlayVisible} />
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <section className="rounded-lg border border-red-200 bg-white p-5 shadow-sm">
+        <section className="rounded-lg border border-red-200 bg-white p-5 shadow-sm min-w-0">
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-red-700">

@@ -43,7 +43,7 @@ export default function AuthForm({ mode = 'login' }) {
   const [showPw, setShowPw] = useState(false);
   const [selectedRole, setSelectedRole] = useState(mode === 'register' ? 'victim' : null);
   const isRegister = mode === 'register';
-  const isLoading  = status === 'loading';
+  const isLoading = status === 'loading';
   const selectedRoleLabel = roleOptions.find((option) => option.role === selectedRole)?.label || 'Selected role';
 
   useEffect(() => {
@@ -95,9 +95,9 @@ export default function AuthForm({ mode = 'login' }) {
           </p>
           <div className="space-y-4">
             {[
-              { icon: Siren,         text: 'One-tap SOS with live authority alerts' },
+              { icon: Siren, text: 'One-tap SOS with live authority alerts' },
               { icon: AlertTriangle, text: 'AI risk prediction from weather + seismic data' },
-              { icon: Shield,        text: 'Role-based command for all responders' },
+              { icon: Shield, text: 'Role-based command for all responders' },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-3 text-sm text-slate-300">
                 <div className="w-8 h-8 rounded-lg bg-indigo-600/20 flex items-center justify-center shrink-0">

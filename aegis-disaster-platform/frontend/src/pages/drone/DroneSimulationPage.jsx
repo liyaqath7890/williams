@@ -366,7 +366,7 @@ const DroneSimulationPage = () => {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_380px] xl:gap-8">
-        <div className="space-y-6">
+        <div className="space-y-6 min-w-0">
           <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex min-w-0 items-start gap-3">

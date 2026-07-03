@@ -112,7 +112,7 @@ export default function ChatPage() {
           </div>
         </aside>
 
-        <section className="flex min-h-[560px] flex-col">
+        <section className="flex min-h-[560px] flex-col min-w-0">
           <header className="border-b border-slate-200 px-4 py-3">
             <div className="flex items-center justify-between gap-3">
               <div>

@@ -117,10 +117,10 @@ export default function DashboardLayout() {
   const unread = alerts.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="flex h-screen overflow-hidden bg-slate-100">
 
-      {/* â”€â”€ DESKTOP SIDEBAR â”€â”€ */}
-      <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-slate-200 bg-white lg:flex lg:flex-col z-30 shadow-sm">
+      {/* ── DESKTOP SIDEBAR ── */}
+      <aside className="shrink-0 hidden w-72 border-r border-slate-200 bg-white lg:flex lg:flex-col z-30 shadow-sm">
         <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
           <div className="h-10 w-10 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200 shrink-0">
             <Shield className="text-white h-5 w-5" />
@@ -155,9 +155,9 @@ export default function DashboardLayout() {
         <div className="mx-4 mb-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 text-xs text-slate-600">
           <p className="font-black text-[10px] uppercase tracking-widest text-slate-400 mb-2">How Aegis Works</p>
           <ul className="space-y-1.5">
-            <li className="flex items-start gap-2"><span className="text-indigo-400 shrink-0 mt-0.5">â–¸</span>Victims send SOS, find shelters, get alerts.</li>
-            <li className="flex items-start gap-2"><span className="text-teal-400 shrink-0 mt-0.5">â–¸</span>Helpers coordinate resources and missions.</li>
-            <li className="flex items-start gap-2"><span className="text-violet-400 shrink-0 mt-0.5">â–¸</span>Authorities manage alerts and analytics.</li>
+            <li className="flex items-start gap-2"><span className="text-indigo-400 shrink-0 mt-0.5">▸</span>Victims send SOS, find shelters, get alerts.</li>
+            <li className="flex items-start gap-2"><span className="text-teal-400 shrink-0 mt-0.5">▸</span>Helpers coordinate resources and missions.</li>
+            <li className="flex items-start gap-2"><span className="text-violet-400 shrink-0 mt-0.5">▸</span>Authorities manage alerts and analytics.</li>
           </ul>
         </div>
 
@@ -217,7 +217,7 @@ export default function DashboardLayout() {
         </div>
       </aside>
 
-      {/* â”€â”€ MOBILE SIDEBAR DRAWER â”€â”€ */}
+      {/* ── MOBILE SIDEBAR DRAWER ── */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
@@ -312,10 +312,10 @@ export default function DashboardLayout() {
         )}
       </AnimatePresence>
 
-      {/* â”€â”€ MAIN CONTENT â”€â”€ */}
-      <div className="lg:pl-72">
+      {/* ── MAIN CONTENT ── */}
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 py-3 sm:px-6"
+        <header className="shrink-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 py-3 sm:px-6"
           style={{ paddingTop: 'max(0.75rem, var(--safe-top))' }}>
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -399,7 +399,7 @@ export default function DashboardLayout() {
         </header>
 
         {/* Page content */}
-        <main className="p-4 sm:p-6 dashboard-content">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 dashboard-content">
           <Outlet />
         </main>
       </div>

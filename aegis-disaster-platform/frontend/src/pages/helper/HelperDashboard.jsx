@@ -90,7 +90,7 @@ export default function HelperDashboard() {
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <div className="space-y-6">
+        <div className="space-y-6 min-w-0">
           <StatusBoard title="Field Readiness" items={fieldStatus} />
 
           {showAssignedQueue && (

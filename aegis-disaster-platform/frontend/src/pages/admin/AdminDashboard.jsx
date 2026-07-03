@@ -96,7 +96,7 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid gap-8 xl:grid-cols-[1fr_350px]">
-        <div className="space-y-8">
+        <div className="space-y-8 min-w-0">
           <AegisTable 
             title="Live Deployment Grid" 
             columns={columns} 
